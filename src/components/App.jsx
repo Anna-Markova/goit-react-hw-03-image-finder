@@ -16,6 +16,7 @@ export class App extends Component {
     modalOpen: false,
     modalImg: '',
     modalAlt: '',
+    totalHits: 0,
   };
 
   handleSubmit = async e => {
@@ -43,6 +44,10 @@ export class App extends Component {
       images: [...this.state.images, ...response],
       pageNr: this.state.pageNr + 1,
     });
+    if (response.totalHits <12 || response.hits.length <12)
+    {this.setState({currentSearch: false})
+  }
+  else {this.setState({currentSearch: true})}
   };
 
   handleImageClick = e => {
