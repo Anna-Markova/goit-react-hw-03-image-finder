@@ -16,6 +16,7 @@ export class App extends Component {
     modalOpen: false,
     modalImg: '',
     modalAlt: '',
+    totalHits: 0,
   };
 
   handleSubmit = async e => {
