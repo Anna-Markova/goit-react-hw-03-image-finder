@@ -19,36 +19,47 @@ export class App extends Component {
     totalHits: 0,
   };
 
-  handleSubmit = async e => {
+  handleSubmit =  e => {
     e.preventDefault();
-    this.setState({ isLoading: true });
-    const inputForSearch = e.target.elements.inputForSearch;
-    if (inputForSearch.value.trim() === '') {
-      return;
-    }
-    const response = await fetchImages(inputForSearch.value, 1);
-    this.setState({
-      images: response,
+    this.setState({ 
+      currentSearch: e.target.elements.inputForSearch.value,
+      images: [],
       isLoading: false,
-      currentSearch: inputForSearch.value,
       pageNr: 1,
+      modalopen: false,
+      modalImg: '',
+      modalAlt: '',
+      totalHits: 0,
     });
   };
 
-  handleClickMore = async () => {
-    const response = await fetchImages(
-      this.state.currentSearch,
-      this.state.pageNr + 1
-    );
-    this.setState({
-      images: [...this.state.images, ...response],
-      pageNr: this.state.pageNr + 1,
+  handleClickMore =  () => {
+    this.setState9prev => ({
+      pageNr: prev.pageNr + 1,
     });
-    if (response.totalHits <12 || response.hits.length <12)
-    {this.setState({currentSearch: false})
-  }
-  else{this.setState({currentSearch: true})}
-  };
+    async componentDidUpdate(prevProps, prevState) {
+      const {currentSearch, pageNr} = this.state;
+      if (
+        prevState.currentSearch !== currentSearch || 
+        prevState.pageNr !== pageNr
+      ) {
+        this.setState({isLoading: true });
+        try {
+          const {hits, totalHits} = await fetchImages (
+            this.state.currentSearch,
+            this.state.pageNr
+          );
+          this.setState(prev => ({
+            images: [...prev.images, ...hits],
+            totalHits: totalHits,
+          }));
+        } catch (error) {
+          console.log(error);
+        } finally {
+          this.setState({ isLoading: false});
+        }
+      }
+    }
 
   handleImageClick = e => {
     this.setState({
@@ -95,7 +106,8 @@ export class App extends Component {
               onImageClick={this.handleImageClick}
               images={this.state.images}
             />
-            {this.state.images.length > 0 ? (
+            {this.state.images.length > 0 &&
+            this.state.images.length < this.state.totalHits && (
               <Button onClick={this.handleClickMore} />
             ) : null}
           </React.Fragment>
