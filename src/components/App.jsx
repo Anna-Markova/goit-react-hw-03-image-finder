@@ -16,50 +16,34 @@ export class App extends Component {
     modalOpen: false,
     modalImg: '',
     modalAlt: '',
-    totalHits: 0,
-  }};
+  };
 
-  handleSubmit =  e => {
+  handleSubmit = async e => {
     e.preventDefault();
-    this.setState({ 
-      currentSearch: e.target.elements.inputForSearch.value,
-      images: [],
+    this.setState({ isLoading: true });
+    const inputForSearch = e.target.elements.inputForSearch;
+    if (inputForSearch.value.trim() === '') {
+      return;
+    }
+    const response = await fetchImages(inputForSearch.value, 1);
+    this.setState({
+      images: response,
       isLoading: false,
+      currentSearch: inputForSearch.value,
       pageNr: 1,
-      modalopen: false,
-      modalImg: '',
-      modalAlt: '',
-      totalHits: 0,
     });
   };
 
-  handleClickMore =  () => {
-    this.setState(prev => ({
-      pageNr: prev.pageNr + 1,
-    }));
-    async componentDidUpdate(prevProps, prevState) {
-      const {currentSearch, pageNr} = this.state;
-      if (
-        prevState.currentSearch !== currentSearch || 
-        prevState.pageNr !== pageNr
-      ) {
-        this.setState({isLoading: true });
-        try {
-          const {hits, totalHits} = await fetchImages (
-            this.state.currentSearch,
-            this.state.pageNr
-          );
-          this.setState(prev => ({
-            images: [...prev.images, ...hits],
-            totalHits: totalHits,
-          }));
-        } catch (error) {
-          console.log(error);
-        } finally {
-          this.setState({ isLoading: false});
-        }
-      }
-    }
+  handleClickMore = async () => {
+    const response = await fetchImages(
+      this.state.currentSearch,
+      this.state.pageNr + 1
+    );
+    this.setState({
+      images: [...this.state.images, ...response],
+      pageNr: this.state.pageNr + 1,
+    });
+  };
 
   handleImageClick = e => {
     this.setState({
@@ -106,10 +90,9 @@ export class App extends Component {
               onImageClick={this.handleImageClick}
               images={this.state.images}
             />
-            {this.state.images.length > 0 &&
-            this.state.images.length < this.state.totalHits && (
+            {this.state.images.length > 0 ? (
               <Button onClick={this.handleClickMore} />
-            )}
+            ) : null}
           </React.Fragment>
         )}
         {this.state.modalOpen ? (
