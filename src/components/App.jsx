@@ -17,7 +17,7 @@ export class App extends Component {
     modalImg: '',
     modalAlt: '',
     totalHits: 0,
-  };
+  }};
 
   handleSubmit =  e => {
     e.preventDefault();
@@ -34,9 +34,9 @@ export class App extends Component {
   };
 
   handleClickMore =  () => {
-    this.setState9prev => ({
+    this.setState(prev => ({
       pageNr: prev.pageNr + 1,
-    });
+    }));
     async componentDidUpdate(prevProps, prevState) {
       const {currentSearch, pageNr} = this.state;
       if (
@@ -109,7 +109,7 @@ export class App extends Component {
             {this.state.images.length > 0 &&
             this.state.images.length < this.state.totalHits && (
               <Button onClick={this.handleClickMore} />
-            ) : null}
+            )}
           </React.Fragment>
         )}
         {this.state.modalOpen ? (
